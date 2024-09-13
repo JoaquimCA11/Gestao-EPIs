@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar EPIs - Gestão de EPIs</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <!-- Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand mx-auto d-flex align-items-center" href="index.html">
+            <img src="/img/logo.png" alt="Logo" width="50" height="50" class="d-inline-block align-top mr-2">
+            <span>Gestão de EPIs</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="gerenciar-epis.html">Gerenciar EPIs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="turmas.html">Turmas e Cursos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="relatorios.html">Relatórios</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Cabeçalho -->
+    <header class="text-center">
+        <div class="container">
+            <h1 class="display-4">Gerenciar EPIs</h1>
+            <p class="lead">Controle a distribuição, validade e inventário dos Equipamentos de Proteção Individual.</p>
+        </div>
+    </header>
+
+    <!-- Seção de Gerenciamento de EPIs -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row text-center" id="cardContainer">
+                <!-- Os cards serão gerados dinamicamente aqui -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Modais dinâmicos -->
+    <div class="modal fade" id="modalEpi" tabindex="-1" aria-labelledby="modalEpiLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEpiLabel">Detalhes do EPI</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="notaFiscal">Nota Fiscal</label>
+                        <input type="text" class="form-control" id="notaFiscal" />
+                    </div>
+                    <div class="form-group">
+                        <label for="fornecedor">Fornecedor</label>
+                        <input type="text" class="form-control" id="fornecedor" />
+                    </div>
+                    <div class="form-group">
+                        <label for="compradoPor">Comprado por</label>
+                        <input type="text" class="form-control" id="compradoPor" />
+                    </div>
+                    <div class="form-group">
+                        <label for="valor">Valor</label>
+                        <input type="text" class="form-control" id="valor" />
+                    </div>
+                    <div class="form-group">
+                        <label for="dataCompra">Data de Compra</label>
+                        <input type="text" class="form-control" id="dataCompra" />
+                    </div>
+                    <div class="form-group">
+                        <label for="validade">Validade</label>
+                        <input type="text" class="form-control" id="validade" placeholder="MM/AAAA" />
+                    </div>
+                    <div class="form-group">
+                        <label for="distribuidos">Distribuídos</label>
+                        <input type="text" class="form-control" id="distribuidos" />
+                    </div>
+                    <div class="form-group">
+                        <label for="emUso">Em Uso</label>
+                        <input type="text" class="form-control" id="emUso" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="saveChanges">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="text-white text-center py-4">
+        <p>&copy; 2024 Gestão de EPIs. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Função para carregar os dados do Local Storage
+            function loadTableData() {
+                const savedData = JSON.parse(localStorage.getItem('epiTableData'));
+                return savedData || [];
+            }
+
+            // Função para formatar a validade no formato MM/AAAA
+            function formatValidityToBR(dateString) {
+                if (!dateString) return '';
+                const [year, month] = dateString.split('-');
+                return `${month}/${year}`;
+            }
+
+            // Função para formatar a validade no formato AAAA-MM
+            function formatValidityToUS(dateString) {
+                const [month, year] = dateString.split('/');
+                return `${year}-${month}`;
+            }
+
+            // Carregar os dados da tabela
+            const epiTableData = loadTableData();
+            const cardContainer = document.getElementById('cardContainer');
+
+            // Função para criar um card
+            function createCard(item, index) {
+                return `
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">${item.tipo || ''}</h5>
+                                <p class="card-text">Estoque: ${item.quantidade || ''} unidades<br>Validade: ${formatValidityToBR(item.validade) || ''}<br>Distribuídos: ${item.distribuidos || ''}<br>Em Uso: ${item.emUso || ''}</p>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEpi" 
+                                    data-index="${index}" 
+                                    data-nota-fiscal="${item.notaFiscal || ''}" 
+                                    data-fornecedor="${item.fornecedor || ''}" 
+                                    data-comprado-por="${item.compradoPor || ''}" 
+                                    data-valor="${item.valor || ''}" 
+                                    data-data-compra="${formatDateToBR(item.dataCompra) || ''}" 
+                                    data-validade="${formatValidityToBR(item.validade) || ''}"
+                                    data-distribuidos="${item.distribuidos || ''}"
+                                    data-em-uso="${item.emUso || ''}">Ver Detalhes</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Adicionar os cards ao container
+            cardContainer.innerHTML = epiTableData.map((item, index) => createCard(item, index)).join('');
+
+            // Configurar o modal para exibir detalhes
+            $('#modalEpi').on('show.bs.modal', function (event) {
+                const button = $(event.relatedTarget);
+                const index = button.data('index');
+                const notaFiscal = button.data('nota-fiscal') || '';
+                const fornecedor = button.data('fornecedor') || '';
+                const compradoPor = button.data('comprado-por') || '';
+                const valor = button.data('valor') || '';
+                const dataCompra = button.data('data-compra') || '';
+                const validade = button.data('validade') || '';
+                const distribuidos = button.data('distribuidos') || '';
+                const emUso = button.data('em-uso') || '';
+
+                const modal = $(this);
+                modal.find('#notaFiscal').val(notaFiscal);
+                modal.find('#fornecedor').val(fornecedor);
+                modal.find('#compradoPor').val(compradoPor);
+                modal.find('#valor').val(valor);
+                modal.find('#dataCompra').val(dataCompra);
+                modal.find('#validade').val(validade);
+                modal.find('#distribuidos').val(distribuidos);
+                modal.find('#emUso').val(emUso);
+                modal.data('index', index);
+            });
+
+            // Salvar alterações no modal
+            document.getElementById('saveChanges').addEventListener('click', function () {
+                const modal = $('#modalEpi');
+                const index = modal.data('index');
+
+                // Atualizar os dados do item
+                const updatedData = {
+                    tipo: epiTableData[index].tipo || '',
+                    quantidade: epiTableData[index].quantidade || '',
+                    validade: formatValidityToUS($('#validade').val()) || '',
+                    notaFiscal: $('#notaFiscal').val() || '',
+                    fornecedor: $('#fornecedor').val() || '',
+                    compradoPor: $('#compradoPor').val() || '',
+                    valor: $('#valor').val() || '',
+                    dataCompra: formatDateToUS($('#dataCompra').val()) || '',
+                    distribuidos: $('#distribuidos').val() || '',
+                    emUso: $('#emUso').val() || ''
+                };
+
+                epiTableData[index] = updatedData;
+                localStorage.setItem('epiTableData', JSON.stringify(epiTableData));
+
+                // Atualizar os cards na página
+                cardContainer.innerHTML = epiTableData.map((item, index) => createCard(item, index)).join('');
+
+                // Fechar o modal
+                $('#modalEpi').modal('hide');
+            });
+
+            // Função para formatar data para padrão brasileiro (DD/MM/AAAA)
+            function formatDateToBR(dateString) {
+                if (!dateString) return '';
+                const [year, month, day] = dateString.split('-');
+                return `${day}/${month}/${year}`;
+            }
+
+            // Função para formatar data para padrão americano (AAAA-MM-DD)
+            function formatDateToUS(dateString) {
+                const [day, month, year] = dateString.split('/');
+                return `${year}-${month}-${day}`;
+            }
+        });
+    </script>
+</body>
+
+</html>

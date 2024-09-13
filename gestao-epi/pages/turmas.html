@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turmas e Cursos - Gestão de EPIs</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand mx-auto d-flex align-items-center" href="index.html">
+            <img src="/img/logo.png" alt="Logo" width="50" height="50" class="d-inline-block align-top mr-2">
+            <span>Gestão de EPIs</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="gerenciar-epis.html">Gerenciar EPIs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="turmas.html">Turmas e Cursos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="relatorios.html">Relatórios</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+
+    <header class="text-center">
+        <h1 class="display-4">Turmas e Cursos</h1>
+        <p class="lead">Gerencie as turmas, cursos e alunos relacionados à distribuição de EPIs.</p>
+    </header>
+
+    <div class="container mt-5">
+        <button class="btn btn-success mb-4" data-toggle="modal" data-target="#modalAddTurma">Adicionar Nova Turma</button>
+        <div class="row" id="turmasContainer">
+            <!-- Turmas serão adicionadas dinamicamente aqui -->
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Turma -->
+    <div class="modal fade" id="modalAddTurma" tabindex="-1" aria-labelledby="modalAddTurmaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAddTurmaLabel">Adicionar Nova Turma</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formAddTurma">
+                        <div class="form-group">
+                            <label for="nomeTurma">Nome da Turma</label>
+                            <input type="text" class="form-control" id="nomeTurma" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cursoTurma">Curso</label>
+                            <input type="text" class="form-control" id="cursoTurma" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="episTurma">EPIs Entregues</label>
+                            <div id="episTurmaCheckboxes" class="form-check">
+                                <!-- Os checkboxes de EPIs serão carregados dinamicamente -->
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Adicionar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ver Alunos (com Adição e Edição de Alunos) -->
+    <div class="modal fade" id="modalVerAlunos" tabindex="-1" aria-labelledby="modalVerAlunosLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalVerAlunosLabel">Alunos da Turma</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulário para adicionar novo aluno -->
+                    <form id="formAddAluno">
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="nomeAluno">Nome do Aluno</label>
+                                <input type="text" class="form-control" id="nomeAluno" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="raAluno">RA do Aluno</label>
+                                <input type="text" class="form-control" id="raAluno" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="episAluno">EPIs Entregues</label>
+                                <div id="episAlunoCheckboxes" class="form-check">
+                                    <!-- Os checkboxes de EPIs serão carregados dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-3">Adicionar Aluno</button>
+                    </form>
+                    <!-- Tabela de alunos -->
+                    <table class="table table-bordered" id="alunosTable">
+                        <thead id="tableHeader">
+                            <!-- O cabeçalho será carregado dinamicamente -->
+                        </thead>
+                        <tbody id="alunosTableBody">
+                            <!-- Alunos serão adicionados dinamicamente aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Aluno -->
+    <div class="modal fade" id="modalEditarAluno" tabindex="-1" aria-labelledby="modalEditarAlunoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarAlunoLabel">Editar Aluno</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarAluno">
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="nomeAlunoEdit">Nome do Aluno</label>
+                                <input type="text" class="form-control" id="nomeAlunoEdit" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="raAlunoEdit">RA do Aluno</label>
+                                <input type="text" class="form-control" id="raAlunoEdit" required>
+                            </div>
+                            <input type="hidden" id="alunoIndexEdit">
+                            <div class="form-group col-md-4">
+                                <label for="episAlunoEdit">EPIs Entregues</label>
+                                <div id="episAlunoCheckboxesEdit" class="form-check">
+                                    <!-- Os checkboxes de EPIs serão carregados dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-3">Salvar Alterações</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-white text-center py-4 mt-5">
+        <p>&copy; 2024 Gestão de EPIs. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Função para carregar EPIs do localStorage e adicionar ao select
+        function carregarEPIs(turmaEPIs = []) {
+            const epiData = JSON.parse(localStorage.getItem('epiTableData')) || [];
+            const episTurmaCheckboxes = document.getElementById('episTurmaCheckboxes');
+            const episAlunoCheckboxes = document.getElementById('episAlunoCheckboxes');
+            const episAlunoCheckboxesEdit = document.getElementById('episAlunoCheckboxesEdit');
+
+            // Criar checkboxes para o select
+            const options = epiData.map(epi => {
+                const checked = turmaEPIs.includes(epi.tipo) ? 'checked' : '';
+                return `<div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="${epi.tipo}" id="epi_${epi.tipo}" ${checked}>
+                            <label class="form-check-label" for="epi_${epi.tipo}">
+                                ${epi.tipo}
+                            </label>
+                        </div>`;
+            }).join('');
+
+            episTurmaCheckboxes.innerHTML = options;
+            episAlunoCheckboxes.innerHTML = options;
+            episAlunoCheckboxesEdit.innerHTML = options;
+        }
+
+        // Função para carregar as turmas do localStorage
+        function carregarTurmas() {
+            let turmas = JSON.parse(localStorage.getItem('turmas')) || [];
+            const turmasContainer = document.getElementById('turmasContainer');
+            turmasContainer.innerHTML = '';
+            turmas.forEach((turma, index) => {
+                // Garantir que 'epis' é um array
+                const epis = Array.isArray(turma.epis) ? turma.epis : [];
+                turmasContainer.innerHTML += `
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">${turma.nome}</h5>
+                                <p class="card-text">Curso: ${turma.curso}</p>
+                                <p class="card-text">EPIs Entregues: ${epis.join(', ')}</p>
+                                <button class="btn btn-primary" onclick="verAlunos(${index})">Ver Alunos</button>
+                                <button class="btn btn-warning" onclick="editarTurma(${index})">Editar</button>
+                                <button class="btn btn-danger" onclick="removerTurma(${index})">Remover</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // Função para adicionar uma nova turma
+        document.getElementById('formAddTurma').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let turmas = JSON.parse(localStorage.getItem('turmas')) || [];
+            let episSelecionados = Array.from(document.querySelectorAll('#episTurmaCheckboxes input:checked')).map(input => input.value);
+            let novaTurma = {
+                nome: document.getElementById('nomeTurma').value,
+                curso: document.getElementById('cursoTurma').value,
+                epis: episSelecionados,
+                alunos: []
+            };
+            turmas.push(novaTurma);
+            localStorage.setItem('turmas', JSON.stringify(turmas));
+            carregarTurmas();
+            $('#modalAddTurma').modal('hide');
+        });
+
+        // Função para ver os alunos da turma
+        function verAlunos(index) {
+            let turmas = JSON.parse(localStorage.getItem('turmas')) || [];
+            const alunosTableBody = document.getElementById('alunosTableBody');
+            const tableHeader = document.getElementById('tableHeader');
+            alunosTableBody.innerHTML = '';
+            const epis = turmas[index].epis;
+
+            // Criar o cabeçalho da tabela dinamicamente com base nos EPIs
+            tableHeader.innerHTML = `
+                <tr>
+                    <th>Nome do Aluno</th>
+                    ${epis.map(epi => `<th>${epi}</th>`).join('')}
+                    <th>Ações</th>
+                </tr>`;
+
+            turmas[index].alunos.forEach((aluno, alunoIndex) => {
+                alunosTableBody.innerHTML += `
+                    <tr>
+                        <td>${aluno.nome}</td>
+                        ${epis.map(epi => `<td>${aluno.epis.includes(epi) ? 'Sim' : 'Não'}</td>`).join('')}
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editarAluno(${index}, ${alunoIndex})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="removerAluno(${index}, ${alunoIndex})">Remover</button>
+                        </td>
+                    </tr>`;
+            });
+            $('#modalVerAlunos').modal('show');
+            $('#modalVerAlunos').data('turmaIndex', index); // Armazenar o índice da turma
+        }
+
+        // Função para adicionar um aluno
+        document.getElementById('formAddAluno').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const turmaIndex = $('#modalVerAlunos').data('turmaIndex');
+            let turmas = JSON.parse(localStorage.getItem('turmas')) || [];
+            let novoAluno = {
+                nome: document.getElementById('nomeAluno').value,
+                ra: document.getElementById('raAluno').value,
+                epis: Array.from(document.querySelectorAll('#episAlunoCheckboxes input:checked')).map(input => input.value)
+            };
+            turmas[turmaIndex].alunos.push(novoAluno);
+            localStorage.setItem('turmas', JSON.stringify(turmas));
+            verAlunos(turmaIndex); // Recarregar alunos
+        });
+
+        // Função para editar um aluno
+        function editarAluno(turmaIndex, alunoIndex) {
+            let turmas = JSON.parse(localStorage.getItem('turmas')) || [];
+            let aluno = turmas[turmaIndex].alunos[alunoIndex];
+            document.getElementById('nomeAlunoEdit').value = aluno.nome;
+            document.getElementById('raAlunoEdit').value = aluno.ra;
+            document.getElementById('alunoIndexEdit').value = alunoIndex;
+
+            // Selecionar EPIs do aluno
+            const episAlunoCheckboxesEdit = document.getElementById('episAlunoCheckboxesEdit');
+            const epiData = JSON.parse(localStorage.getItem('epiTableData')) || [];
+            episAlunoCheckboxesEdit.innerHTML = epiData.map(epi => {
+                const checked = aluno.epis.includes(epi.tipo) ? 'checked' : '';
+                return `<div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="${epi.tipo}" id="epi_${epi.tipo}_edit" ${checked}>
+                            <label class="form-check-label" for="epi_${epi.tipo}_edit">
+                                ${epi.tipo}
+                            </label>
+                        </div>`;
+            }).join('');
+
+            $('#modalEditarAluno').modal('show');
+        }
+
+        // Função para salvar as alterações de um aluno
+        document.getElementById('formEditarAluno').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const turmaIndex = $('#modalVerAlunos').data('turmaIndex');
+            const alunoIndex = document.getElementById('alunoIndexEdit').value;
+            let turmas = JSON.parse(localStorage.getItem('turmas')) || [];
+            let alunoEditado = {
+                nome: document.getElementById('nomeAlunoEdit').value,
+                ra: document.getElementById('raAlunoEdit').value,
+                epis: Array.from(document.querySelectorAll('#episAlunoCheckboxesEdit input:checked')).map(input => input.value)
+            };
+            turmas[turmaIndex].alunos[alunoIndex] = alunoEditado;
+            localStorage.setItem('turmas', JSON.stringify(turmas));
+            verAlunos(turmaIndex); // Recarregar alunos
+            $('#modalEditarAluno').modal('hide');
+        });
+
+        // Função para remover um aluno
+        function removerAluno(turmaIndex, alunoIndex) {
+            if (confirm('Tem certeza que deseja remover este aluno?')) {
+                let turmas = JSON.parse(localStorage.getItem('turmas')) || [];
+                turmas[turmaIndex].alunos.splice(alunoIndex, 1);
+                localStorage.setItem('turmas', JSON.stringify(turmas));
+                verAlunos(turmaIndex);
+            }
+        }
+
+        // Função para editar uma turma
+        function editarTurma(index) {
+            let turmas = JSON.parse(localStorage.getItem('turmas')) || [];
+            document.getElementById('nomeTurma').value = turmas[index].nome;
+            document.getElementById('cursoTurma').value = turmas[index].curso;
+            const episTurmaCheckboxes = document.getElementById('episTurmaCheckboxes');
+            const episSelecionados = turmas[index].epis;
+
+            // Selecionar EPIs da turma
+            episTurmaCheckboxes.querySelectorAll('input').forEach(input => {
+                input.checked = episSelecionados.includes(input.value);
+            });
+
+            $('#modalAddTurma').modal('show');
+            document.getElementById('formAddTurma').onsubmit = function(e) {
+                e.preventDefault();
+                turmas[index] = {
+                    nome: document.getElementById('nomeTurma').value,
+                    curso: document.getElementById('cursoTurma').value,
+                    epis: Array.from(document.querySelectorAll('#episTurmaCheckboxes input:checked')).map(input => input.value),
+                    alunos: turmas[index].alunos
+                };
+                localStorage.setItem('turmas', JSON.stringify(turmas));
+                carregarTurmas();
+                $('#modalAddTurma').modal('hide');
+            }
+        }
+
+        // Função para remover uma turma com confirmação
+        function removerTurma(index) {
+            if (confirm('Tem certeza que deseja remover esta turma?')) {
+                let turmas = JSON.parse(localStorage.getItem('turmas')) || [];
+                turmas.splice(index, 1);
+                localStorage.setItem('turmas', JSON.stringify(turmas));
+                carregarTurmas();
+            }
+        }
+
+        // Inicializa o conteúdo da página
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarEPIs(); // Carregar EPIs antes das turmas
+            carregarTurmas();
+        });
+    </script>
+</body>
+</html>

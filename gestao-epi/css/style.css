@@ -1,0 +1,215 @@
+/* BODY */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f9;
+}
+
+/* NAVBAR */
+.navbar {
+    background-color: #343a40;
+}
+
+.navbar-brand img {
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.navbar-brand img:hover {
+    transform: scale(1.1);
+}
+
+/* CARD */
+.card {
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.08);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card .card-body {
+    padding: 2rem;
+}
+
+.card-title {
+    font-weight: bold;
+    color: #333;
+}
+
+.card-text {
+    font-size: 0.95rem;
+    color: #666;
+}
+
+.card i {
+    margin-bottom: 20px;
+}
+
+/* CARD COLORS */
+.card.border-primary i {
+    color: #007bff;
+}
+
+.card.border-success i {
+    color: #28a745;
+}
+
+.card.border-info i {
+    color: #17a2b8;
+}
+
+/* BUTTONS */
+.btn-primary,
+.btn-success,
+.btn-info {
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-weight: bold;
+}
+
+/* HEADER */
+header {
+    background: linear-gradient(to right, #007bff, #6610f2);
+    color: white;
+    padding: 100px 0;
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+}
+
+header h1 {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+header p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+/* FOOTER */
+footer {
+    background-color: #343a40;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* CONTAINER */
+.container .row.text-center {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* MEDIA QUERIES */
+@media (max-width: 767.98px) {
+    header {
+        padding: 70px 0;
+        text-align: center;
+    }
+
+    header h1 {
+        font-size: 2.5rem;
+    }
+
+    .container .row.text-center {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+}
+
+/* MODAL */
+.modal-header {
+    background-color: #007bff;
+    color: white;
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.modal-title {
+    font-weight: bold;
+}
+
+.modal-body .form-control {
+    border-radius: 50px;
+    padding: 10px 20px;
+}
+
+/* CHART CONTAINER */
+.chart-container {
+    margin-top: 30px;
+}
+
+.chart-container .card {
+    background-color: #ffffff;
+    border-radius: 15px;
+}
+
+.chart-container .card-body {
+    padding: 2rem;
+}
+
+    /* Estilização personalizada para a tabela */
+    #epiTable {
+        border-collapse: collapse;
+        width: 100%;
+        background-color: #fff;
+        font-size: 14px;
+    }
+
+    #epiTable th, #epiTable td {
+        text-align: center;
+        padding: 12px;
+    }
+
+    #epiTable th {
+        background-color: #007bff; /* Cor de fundo para o cabeçalho */
+        color: #fff; /* Cor do texto para o cabeçalho */
+        font-weight: bold;
+    }
+
+    #epiTable tr:nth-child(even) {
+        background-color: #f2f2f2; /* Cor de fundo alternada para as linhas */
+    }
+
+    #epiTable tr:hover {
+        background-color: #e9ecef; /* Cor de fundo ao passar o mouse sobre a linha */
+    }
+
+    #epiTable .btn {
+        margin: 0 2px;
+    }
+
+    /* Estilização para botões na coluna de ações */
+    #epiTable .btn-edit {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    #epiTable .btn-edit:hover {
+        background-color: #218838;
+    }
+
+    #epiTable .btn-delete {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    #epiTable .btn-delete:hover {
+        background-color: #c82333;
+    }
+
+    /* Estilização de bordas da tabela */
+    #epiTable, #epiTable th, #epiTable td {
+        border: 1px solid #dee2e6;
+    }

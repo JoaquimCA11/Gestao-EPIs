@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de EPIs - Gestão de EPIs</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand mx-auto d-flex align-items-center" href="index.html">
+            <img src="/img/logo.png" alt="Logo" width="50" height="50" class="d-inline-block align-top mr-2">
+            <span>Gestão de EPIs</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="gerenciar-epis.html">Gerenciar EPIs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="turmas.html">Turmas e Cursos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="relatorios.html">Relatórios</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- HEADER -->
+    <header>
+        <div class="container text-center">
+            <h1 class="display-4">Relatório de EPIs</h1>
+            <p class="lead">Controle de inventário e distribuição dos Equipamentos de Proteção Individual</p>
+        </div>
+    </header>
+
+    <div class="container mt-5">
+        <!-- Botões de Ação -->
+        <button id="downloadPDF" class="btn btn-danger mb-3">Gerar PDF</button>
+        <button id="addRow" class="btn btn-success mb-3">Adicionar Linha</button>
+
+<!-- Tabela Responsiva -->
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover mt-4" id="epiTable">
+        <thead class="thead-dark bg-primary text-white">
+            <tr>
+                <th scope="col">Tipo de EPI</th>
+                <th scope="col">Quantidade em Estoque</th>
+                <th scope="col">Validade</th>
+                <th scope="col">Distribuídos</th>
+                <th scope="col">Em Uso</th>
+                <th scope="col">Valor</th>
+                <th scope="col">Data de Compra</th>
+                <th scope="col">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Linhas da tabela serão inseridas dinamicamente -->
+        </tbody>
+    </table>
+</div>
+    </div>
+
+    <!-- Modal para exibir detalhes -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Detalhes do EPI</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Detalhes do EPI serão inseridos aqui via JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-white text-center py-4 mt-5">
+        <p>&copy; 2024 Gestão de EPIs. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        // Função para formatar data no padrão brasileiro
+        function formatDate(dateStr, type) {
+            const [year, month, day] = dateStr.split('-');
+            if (type === 'month') {
+                return `${month || '01'}/${year}`;
+            }
+            return `${day || '01'}/${month || '01'}/${year}`;
+        }
+
+        // Função para salvar a tabela no Local Storage
+        function saveTable() {
+            const tableData = [];
+            const rows = document.querySelectorAll('#epiTable tbody tr');
+
+            rows.forEach(row => {
+                const rowData = {
+                    tipo: row.children[0].textContent,
+                    quantidade: row.children[1].textContent,
+                    validade: row.children[2].querySelector('input').value,
+                    distribuidos: row.children[3].textContent,
+                    emUso: row.children[4].textContent,
+                    valor: row.children[5].textContent,
+                    dataCompra: row.children[6].querySelector('input').value,
+                };
+                tableData.push(rowData);
+            });
+
+            localStorage.setItem('epiTableData', JSON.stringify(tableData));
+        }
+
+        // Função para carregar a tabela do Local Storage
+        function loadTable() {
+            const tableBody = document.querySelector('#epiTable tbody');
+            const savedData = JSON.parse(localStorage.getItem('epiTableData'));
+
+            if (savedData) {
+                tableBody.innerHTML = ''; // Limpa a tabela antes de carregar
+                savedData.forEach((rowData, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td contenteditable="true">${rowData.tipo}</td>
+                        <td contenteditable="true" data-default="0 unidades">${rowData.quantidade}</td>
+                        <td><input type="month" value="${rowData.validade}" /></td>
+                        <td contenteditable="true" data-default="0 unidades">${rowData.distribuidos}</td>
+                        <td contenteditable="true" data-default="0 unidades">${rowData.emUso}</td>
+                        <td contenteditable="true" data-default="R$ 0,00">${rowData.valor}</td>
+                        <td><input type="date" value="${rowData.dataCompra}" /></td>
+                        <td>
+                            <button class="btn btn-primary btn-sm viewDetails" data-index="${index}">Ver Detalhes</button>
+                            <button class="btn btn-danger btn-sm removeRow">Remover</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+
+                    // Adiciona o evento de "Ver Detalhes" à nova linha
+                    row.querySelector('.viewDetails').addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        const epiDetails = savedData[index];
+
+                        const modalBody = document.querySelector('.modal-body');
+                        modalBody.innerHTML = `
+                            <p><strong>Tipo de EPI:</strong> ${epiDetails.tipo}</p>
+                            <p><strong>Quantidade em Estoque:</strong> ${epiDetails.quantidade}</p>
+                            <p><strong>Validade:</strong> ${formatDate(epiDetails.validade, 'month')}</p>
+                            <p><strong>Distribuídos:</strong> ${epiDetails.distribuidos}</p>
+                            <p><strong>Em Uso:</strong> ${epiDetails.emUso}</p>
+                            <p><strong>Valor:</strong> ${epiDetails.valor}</p>
+                            <p><strong>Data de Compra:</strong> ${formatDate(epiDetails.dataCompra)}</p>
+                            <p><strong>Nota Fiscal:</strong> Não disponível</p>
+                            <p><strong>Fornecedor:</strong> Não disponível</p>
+                            <p><strong>Comprado por:</strong> Não disponível</p>
+                        `;
+
+                        $('#detailsModal').modal('show');
+                    });
+
+                    // Adiciona o evento de "Remover" à nova linha
+                    row.querySelector('.removeRow').addEventListener('click', function() {
+                        if (confirm('Tem certeza que deseja remover esta linha?')) {
+                            row.remove();
+                            saveTable();
+                        }
+                    });
+                });
+            }
+        }
+
+        // Carrega a tabela ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTable();
+        });
+
+        // Salva a tabela sempre que há uma modificação
+        document.querySelector('#epiTable tbody').addEventListener('input', saveTable);
+
+        // Evento para adicionar nova linha na tabela
+        document.getElementById('addRow').addEventListener('click', function() {
+            const tableBody = document.querySelector('#epiTable tbody');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td contenteditable="true">Novo EPI</td>
+                <td contenteditable="true" data-default="0 unidades">0 unidades</td>
+                <td><input type="month" value="2025-01" /></td>
+                <td contenteditable="true" data-default="0 unidades">0 unidades</td>
+                <td contenteditable="true" data-default="0 unidades">0 unidades</td>
+                <td contenteditable="true" data-default="R$ 0,00">R$ 0,00</td>
+                <td><input type="date" value="2024-01-01" /></td>
+                <td>
+                    <button class="btn btn-primary btn-sm viewDetails">Ver Detalhes</button>
+                    <button class="btn btn-danger btn-sm removeRow">Remover</button>
+                </td>
+            `;
+
+            tableBody.appendChild(newRow);
+
+            // Adiciona evento de "Ver Detalhes" à nova linha
+            newRow.querySelector('.viewDetails').addEventListener('click', function() {
+                const tipoEPI = newRow.children[0].textContent;
+                const quantidade = newRow.children[1].textContent;
+                const validade = newRow.children[2].querySelector('input').value;
+                const distribuidos = newRow.children[3].textContent;
+                const emUso = newRow.children[4].textContent;
+                const valor = newRow.children[5].textContent;
+                const dataCompra = newRow.children[6].querySelector('input').value;
+
+                const modalBody = document.querySelector('.modal-body');
+                modalBody.innerHTML = `
+                    <p><strong>Tipo de EPI:</strong> ${tipoEPI}</p>
+                    <p><strong>Quantidade em Estoque:</strong> ${quantidade}</p>
+                    <p><strong>Validade:</strong> ${formatDate(validade, 'month')}</p>
+                    <p><strong>Distribuídos:</strong> ${distribuidos}</p>
+                    <p><strong>Em Uso:</strong> ${emUso}</p>
+                    <p><strong>Valor:</strong> ${valor}</p>
+                    <p><strong>Data de Compra:</strong> ${formatDate(dataCompra)}</p>
+                    <p><strong>Nota Fiscal:</strong> ${epiDetails.notaFiscal}</p>
+                    <p><strong>Fornecedor:</strong>${epiDetails.fornecedor}</p>
+                    <p><strong>Comprado por:</strong> ${epiDetails.compradoPor}</p>
+                `;
+
+                $('#detailsModal').modal('show');
+            });
+
+            // Adiciona evento de "Remover" à nova linha
+            newRow.querySelector('.removeRow').addEventListener('click', function() {
+                if (confirm('Tem certeza que deseja remover esta linha?')) {
+                    newRow.remove();
+                    saveTable();
+                }
+            });
+
+            saveTable();
+        });
+
+        // Geração de PDF
+        document.getElementById('downloadPDF').addEventListener('click', function () {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.text("Relatório de EPIs", 14, 20);
+            doc.autoTable({
+                startY: 30,
+                html: '#epiTable',
+                styles: {
+                    fontSize: 10,
+                },
+                headStyles: {
+                    fillColor: [0, 32, 96],
+                },
+                columnStyles: {
+                    7: { halign: 'center' } // Centraliza o conteúdo da coluna de ações
+                }
+            });
+
+            doc.save('relatorio_de_epis.pdf');
+        });
+    </script>
+</body>
+</html>
